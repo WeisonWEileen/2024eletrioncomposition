@@ -9,4 +9,27 @@ ls /dev/video**
 ### 好的开源
 https://gitee.com/linsen06/tic-tac-toe-esports/blob/master/minimax.py
 
-### 应该使用 min-max 算法
+### 使用 min-max 算法
+
+### 写死的算法
+首先使用 ```getphase.py``` 进行标定出来就个方框的位置
+
+### 两种模式
+
+第四题
+
+HUMAN -1 X 白色
+AI     1 O 黑色
+
+
+第五题
+
+HUMAN -1 X 黑色
+AI     1 O 白色
+
+
+
+调整模式
+
+
+

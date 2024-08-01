@@ -11,23 +11,18 @@ def init_serial():
   
 def send_data(ser, data):  
     # 假设数据格式是：0x10 + 数据字节 + 0x0A  
-    data = int(data)
-    print(f"已发送数字: {data}")
-    ser.write(bytes([0x0A, data, 0x0B]))  
-    # packed_data = struct.pack('BBB', 0x0A, data, 0x0B)  
-    # ser.write(packed_data)  
+    packed_data = struct.pack('BBB', 0x0A, data, 0x0B)  
+    ser.write(packed_data)  
     ser.flush()  
-    # print(f"send data: {packed_data.hex()}")  
+    print(f"send data: {packed_data.hex()}")  
   
-def read_data(ser):  
+def read_data(ser,cap):  
     # 读取直到遇到期望的帧头（这里假设为0x10）  
+    while True:  
         # 收到一帧就进入这个循环
-    recv_data = ser.read(1)
-    return recv_data
-        # if ser.in_waiting > 0:  
-        #     # 收到就直接跳过,这只是用来阻塞的等待案件的
-        #     byte = ser.read(1)  
-        #     break
+        if ser.in_waiting > 0:  
+            # 收到就直接跳过,这只是用来阻塞的等待案件的
+            byte = ser.read(1)  
             
             # print(byte)
             # if byte == b'\x0A':  # 帧头  

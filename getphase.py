@@ -18,7 +18,15 @@ CAP_HEIGHT = 1080
 # CAP_LENGTH = 800
 
 
-CAP_CENTER = (792,595)
+# CAP_CENTER = (792,595)
+# CAP_LENGTH = 760
+
+
+CAP_WIDTH = 1920
+CAP_HEIGHT = 1080
+# CAP_CENTER = (792,595)
+CAP_CENTER = (681,546)
+CAP_CENTER = (663,575)
 CAP_LENGTH = 760
 
 BOX_SIZE_RATIO = 0.1
@@ -56,8 +64,13 @@ upper_white = np.array([180, 40, 255])  # 设定白色的阈值上限
 lower_black = np.array([0, 0, 0])  # 设定黑色的阈值下限
 upper_black = np.array([180, 255, 46])  # 设定黑色的阈值上限
 
-# 标定的情况下(写死的情况下得到的9的像素点的坐标)
-centers = [ [182, 150]  ,  [398, 155]  ,  [614, 160]  ,  [178, 365]  ,  [394, 369]  ,  [609, 374]  ,  [174, 578]  ,  [390, 583]  ,  [603, 586]  ]
+# # 标定的情况下(写死的情况下得到的9的像素点的坐标)
+# centers = [ [182, 150]  ,  [398, 155]  ,  [614, 160]  ,  [178, 365]  ,  [394, 369]  ,  [609, 374]  ,  [174, 578]  ,  [390, 583]  ,  [603, 586]  ]
+
+centers = [ 
+    [148, 134]  ,  [384, 128]  ,  [619, 134]  ,  
+    [145, 374]  ,  [389, 369]  ,  [628, 363]  ,  
+    [145, 614]  ,  [390, 610]  ,  [631, 603]  ]
 
 def findBox(img_bin, frame=None):
     if img_bin is None:
@@ -176,6 +189,19 @@ def nothing(x):
     pass
 cv2.createTrackbar('Threshold', 'camera', 90, 255, nothing)
 
+
+  
+# 假设的鼠标回调函数  
+def mouse_callback(event, x, y, flags, param):  
+    if event == cv2.EVENT_LBUTTONDOWN:  # 如果是左键点击  
+        print(f"Mouse position: ({x}, {y})")  
+  
+# 初始化摄像头和参数（这部分保持你的原代码）  
+# ...  
+  
+# 设置鼠标回调函数  
+cv2.setMouseCallback('camera', mouse_callback)  
+
 while cap.isOpened():
     ret, frame = cap.read()
     if ret:
@@ -194,7 +220,7 @@ while cap.isOpened():
 
             #hsv图像
             hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # 转换为HSV空间
-            # boxs = findBox(frame_bin, frame)
+            boxs = findBox(frame_bin, frame)
             # if len(boxs) == 9:
             #     for i in boxs:
             #         cv2.circle(frame, tuple(i), 5, (0, 0, 255), -1)

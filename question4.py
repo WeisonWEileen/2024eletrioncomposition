@@ -24,23 +24,23 @@ baud_rate = 115200              # 波特率
 
 # 获取评委的输入
 
-first_chesis = 0
-while True:
-    try:  
-        # 尝试将用户输入转换为整数  
-        first_chesis = int(input("请输入一个1到9之间的数字: "))  
-        # 检查数字是否在1到9之间  
-        if 1 <= first_chesis <= 9:  
-            # 如果数字在范围内，打印数字  
-            print(f"第一步设置的方格是是: {first_chesis}")
-            print("程序开始!")
-            break
-        else:  
-            # 如果数字不在范围内，抛出异常  
-            raise ValueError("输入的数字不在1到9之间")  
-    except ValueError as e:  
-        # 如果输入不能转换为整数，或者数字不在范围内，则捕获异常并提示用户  
-        print(f"发生错误: {e}. 请输入一个有效的数字。") 
+# first_chesis = 0
+# while True:
+#     try:  
+#         # 尝试将用户输入转换为整数  
+#         first_chesis = int(input("请输入一个1到9之间的数字: "))  
+#         # 检查数字是否在1到9之间  
+#         if 1 <= first_chesis <= 9:  
+#             # 如果数字在范围内，打印数字  
+#             print(f"第一步设置的方格是是: {first_chesis}")
+#             print("程序开始!")
+#             break
+#         else:  
+#             # 如果数字不在范围内，抛出异常  
+#             raise ValueError("输入的数字不在1到9之间")  
+#     except ValueError as e:  
+#         # 如果输入不能转换为整数，或者数字不在范围内，则捕获异常并提示用户  
+#         print(f"发生错误: {e}. 请输入一个有效的数字。") 
 
 
 # # 发送给单片机执行第一步
@@ -53,8 +53,7 @@ cv2.namedWindow('camera', cv2.WINDOW_AUTOSIZE)
 CAP_WIDTH = 1920
 CAP_HEIGHT = 1080
 
-CAP_WIDTH = 1080
-CAP_HEIGHT =1920
+
 
 
 # ROI
@@ -63,7 +62,7 @@ CAP_HEIGHT =1920
 # CAP_LENGTH = 800
 
 
-CAP_CENTER = (792,595)
+CAP_CENTER = (661,546)
 CAP_LENGTH = 760
 
 BOX_SIZE_RATIO = 0.1
@@ -220,36 +219,7 @@ def analysis(phase):
     next_step_numb = 0
     return next_step_numb
 
-boad_detect = 0
 
-def nothing(x):
-    pass
-cv2.createTrackbar('Threshold', 'camera', 90, 255, nothing)
-import cv2
-import numpy as np
-import math
-# import serial
-import struct
-
-
-
-cv2.namedWindow('camera', cv2.WINDOW_AUTOSIZE)
-
-CAP_WIDTH = 1920
-CAP_HEIGHT = 1080
-
-
-# ROI
-# 原来zcb的在没有装上装置的时候
-# CAP_CENTER = (1080, 607)
-# CAP_LENGTH = 800
-
-
-CAP_CENTER = (792,595)
-CAP_LENGTH = 760
-
-BOX_SIZE_RATIO = 0.1
-EPSILON_RATIO = 0.05
 
 
 # color = {'red': (0, 0, 255),
@@ -352,44 +322,7 @@ def findBox(img_bin, frame=None):
     print(ret)
     return ret
 
-def show_phase(phase):
-    """显示局面"""
-    
-    for i in range(3):
-        for j in range(3):
-            if phase[i,j] == 1: 
-                chessman = chr(0x25cf)
-            elif phase[i,j] == 2:
-                chessman = chr(0x25cb)
-            elif phase[i,j] == 0:
-                chessman = chr(0x2606)
-            print('\033[0;30;43m' + chessman + '\033[0m', end='')
-        print()
 
-def getchessphase(boxs,hsv):
-    phase = np.array([
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]
-    ], dtype=np.ubyte)
-
-    for i in range(9):
-        x = boxs[i][0]
-        y = boxs[i][1]
-        x_start = max(0, int(x) - 20)
-        y_start = max(0, int(y) - 20)
-        x_end = min(hsv.shape[1], int(x) + 20)
-        y_end = min(hsv.shape[0], int(y) + 20)
-        region = hsv[y_start:y_end, x_start:x_end]#棋格中间的区域用来检测颜色
-        mean_color = np.mean(region, axis=(0, 1))
-        if np.all((lower_black <= mean_color) & (mean_color <= upper_black)):
-            phase[i//3,i%3] = 1 #黑色1
-        if np.all((lower_white <= mean_color) & (mean_color <= upper_white)):
-            phase[i//3,i%3] = 2 #白色2/
-    show_phase(phase)
-    print(phase)
-
-    return phase
 
 def analysis(phase):
     # 1. 识别胜负
@@ -402,6 +335,8 @@ boad_detect = 0
 def nothing(x):
     pass
 cv2.createTrackbar('Threshold', 'camera', 90, 255, nothing)
+cv2.createTrackbar('roi_x', 'camera', 667, 900, nothing)
+cv2.createTrackbar('roi_y', 'camera', 565, 800, nothing)
 
 
 
@@ -415,9 +350,13 @@ while cap.isOpened():
     ret, frame = cap.read()
     if ret:
         if frame is not None:
+            roi_x = cv2.getTrackbarPos('roi_x', 'camera')
+            roi_y = cv2.getTrackbarPos('roi_y', 'camera')
+            frame = frame[int(roi_y - (CAP_LENGTH / 2)):int(roi_y + (CAP_LENGTH / 2)),
+                    int(roi_x - (CAP_LENGTH / 2)):int(roi_x+ (CAP_LENGTH / 2)), :]
             # 获取图像
-            frame = frame[int(CAP_CENTER[1] - (CAP_LENGTH / 2)):int(CAP_CENTER[1] + (CAP_LENGTH / 2)),
-                    int(CAP_CENTER[0] - (CAP_LENGTH / 2)):int(CAP_CENTER[0] + (CAP_LENGTH / 2)), :]
+            # frame = frame[int(CAP_CENTER[1] - (CAP_LENGTH / 2)):int(CAP_CENTER[1] + (CAP_LENGTH / 2)),
+                    # int(CAP_CENTER[0] - (CAP_LENGTH / 2)):int(CAP_CENTER[0] + (CAP_LENGTH / 2)), :]
 
             # 预处理
             gs_frame = cv2.GaussianBlur(frame, (7, 7), 0)  # 高斯模糊
@@ -485,58 +424,8 @@ cv2.destroyAllWindows()
 #         cv2.circle(frame, tuple(i), 5, (0, 0, 255), -1)
 #     phase = getchessphase(boxs,hsv)
 # print(boxs)
-while cap.isOpened():
-    ret, frame = cap.read()
-    if ret:
-        if frame is not None:
-            # 获取图像
-            frame = frame[int(CAP_CENTER[1] - (CAP_LENGTH / 2)):int(CAP_CENTER[1] + (CAP_LENGTH / 2)),
-                    int(CAP_CENTER[0] - (CAP_LENGTH / 2)):int(CAP_CENTER[0] + (CAP_LENGTH / 2)), :]
-
-            # 预处理
-            gs_frame = cv2.GaussianBlur(frame, (7, 7), 0)  # 高斯模糊
-            # cv2.imshow('gs_frame', gs_frame)
-            frame_gray = cv2.cvtColor(gs_frame, cv2.COLOR_BGR2GRAY)  # 转化成GRAY图像
-            # _, frame_bin = cv2.threshold(frame_gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-            threshold_value = cv2.getTrackbarPos('Threshold', 'camera')
-            _, frame_bin = cv2.threshold(frame_gray, threshold_value, 255, cv2.THRESH_BINARY)
-
-            #hsv图像
-            hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # 转换为HSV空间
-            # boxs = findBox(frame_bin, frame)
-            # if len(boxs) == 9:
-            #     for i in boxs:
-            #         cv2.circle(frame, tuple(i), 5, (0, 0, 255), -1)
-            #     phase = getchessphase(boxs,hsv)
 
 
-
-            # 写死测试
-            phase = getchessphase(centers,hsv)
-
-
-            
-
-
-            cv2.imshow('gray scale image', frame_gray)
-
-            cv2.imshow('frame_bin', frame_bin)
-            cv2.imshow('camera', frame)
-
-            key = cv2.waitKey(1)
-            if key & 0xFF == ord('q'):
-                cv2.imwrite("img.jpg", frame)
-                break
-            if key & 0xFF == ord('f'):
-                cv2.imwrite("img.jpg", frame)
-                break
-        else:
-            print("无画面")
-    else:
-        print("无法读取摄像头！")
-
-cap.release()
-cv2.destroyAllWindows()
 
 
 

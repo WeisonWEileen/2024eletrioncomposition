@@ -35,7 +35,7 @@ def show_phase(phase):
         print()
 
 def get_board(boxs,hsv):
-    board_tmp = [
+    phase = [
         [0, 0, 0],
         [0, 0, 0],
         [0, 0, 0]
@@ -51,12 +51,12 @@ def get_board(boxs,hsv):
         region = hsv[y_start:y_end, x_start:x_end]#棋格中间的区域用来检测颜色
         mean_color = np.mean(region, axis=(0, 1))
         if np.all((lower_black <= mean_color) & (mean_color <= upper_black)):
-            board_tmp[i//3][i%3] = 1 #黑色1
+            phase[i//3][i%3] = 1 #黑色1
         if np.all((lower_white <= mean_color) & (mean_color <= upper_white)):
-            board_tmp[i//3][i%3] = -1 #白色2/
+            phase[i//3][i%3] = -1 #白色2/
     # show_phase(phase)
     # print(phase)
-    return board_tmp
+    return phase
 
 
 def preprocess(frame):
@@ -69,8 +69,6 @@ def preprocess(frame):
     _, frame_bin = cv2.threshold(frame_gray, threshold_value, 255, cv2.THRESH_BINARY)
 
     #hsv图像
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # 转换为HSV空间
-
-    return hsv 
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # 转换为HSV空间 
 
     # phase = get_board(centers,hsv)

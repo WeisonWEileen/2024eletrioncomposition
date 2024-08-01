@@ -16,10 +16,9 @@ from os import system
 import cv2
 import numpy as np
 
-import stm32_serial
 import vision
 import utils
-import struct  
+import stm32_serial
 
 """
 An implementation of Minimax AI Algorithm in Tic Tac Toe,
@@ -46,10 +45,32 @@ moves = {
 }
 
 
+
+# first_chesis = 0
+# while True:
+#     try:  
+#         # 尝试将用户输入转换为整数  
+#         first_chesis = int(input("请输入一个1到9之间的数字: "))  
+#         # 检查数字是否在1到9之间  
+#         if 1 <= first_chesis <= 9:  
+#             # 如果数字在范围内，打印数字  
+#             print(f"第一步设置的方格是是: {first_chesis}")
+#             print("程序开始!")
+#             break
+#         else:  
+#             # 如果数字不在范围内，抛出异常  
+#             raise ValueError("输入的数字不在1到9之间")  
+#     except ValueError as e:  
+#         # 如果输入不能转换为整数，或者数字不在范围内，则捕获异常并提示用户  
+#         print(f"发生错误: {e}. 请输入一个有效的数字。") 
+
+
 # 设置摄像头的参数
 print((f"start init camera"))
 CAP_WIDTH = 1920
 CAP_HEIGHT = 1080
+# CAP_CENTER = (792,595)
+# CAP_LENGTH = 760
 
 CAP_CENTER = (663,575)
 CAP_LENGTH = 760
@@ -74,15 +95,7 @@ lower_black = np.array([0, 0, 0])  # 设定黑色的阈值下限
 upper_black = np.array([180, 255, 46])  # 设定黑色的阈值上限
 
 # 标定的情况下(写死的情况下得到的9的像素点的坐标)
-# centers = [ [182, 150]  ,  [398, 155]  ,  [619, 131]  ,  [178, 365]  ,  [394, 369]  ,  [609, 374]  ,  [174, 578]  ,  [390, 583]  ,  [603, 586]  ]
-
-# 鼠标点击得到
-centers = [ 
-    [148, 134]  ,  [384, 128]  ,  [619, 134]  ,  
-    [145, 374]  ,  [389, 369]  ,  [628, 363]  ,  
-    [145, 614]  ,  [390, 610]  ,  [631, 603]  ]
-
-
+centers = [ [182, 150]  ,  [398, 155]  ,  [614, 160]  ,  [178, 365]  ,  [394, 369]  ,  [609, 374]  ,  [174, 578]  ,  [390, 583]  ,  [603, 586]  ]
 
 
 def preprocess_image(frame):
@@ -91,8 +104,6 @@ def preprocess_image(frame):
     frame_gray = cv2.cvtColor(gs_frame, cv2.COLOR_BGR2GRAY)  # 转化成GRAY图像
     # _, frame_bin = cv2.threshold(frame_gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
     threshold_value = cv2.getTrackbarPos('Threshold', 'camera')
-
-
     _, frame_bin = cv2.threshold(frame_gray, threshold_value, 255, cv2.THRESH_BINARY)
 
     #hsv图像
@@ -264,7 +275,7 @@ def render(state, c_choice, h_choice):
         print('\n' + str_line)
 
 
-def ai_turn(ser,c_choice, h_choice):
+def ai_turn(ser, c_choice, h_choice):
     """
     It calls the minimax function if the depth < 9,
     else it choices a random coordinate.
@@ -274,10 +285,12 @@ def ai_turn(ser,c_choice, h_choice):
     """
     # 通过摄像头获取当前的 boards 的变量状态,先保证读到的图像是正常的,过滤掉前面几帧
     count = 0
-    while count < 10:
-        ret, frame = cap.read()
-        count += 1
-        cv2.imshow('image_raw', frame)
+    ret, frame = cap.read()
+    cv2.imshow('image_raw', frame)
+    # while count < 10:
+    #     ret, frame = cap.read()
+    #     count += 1
+    #     cv2.imshow('image_raw', frame)
     
     ret, frame = cap.read()
     if ret:
@@ -288,69 +301,83 @@ def ai_turn(ser,c_choice, h_choice):
 
     hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     cv2.imshow('hsv', hsv_frame)
-    board = vision.get_board(centers,hsv_frame)
+    board = vision.get_board(hsv_frame)
     print("get from camera")
     render(board, c_choice, h_choice)
     print("get from camera")
 
 
-    depth = len(empty_cells(board))
-    if depth == 0 or game_over(board):
-        return
-    
-    if depth == 9:
-        x = choice([0, 1, 2])
-        y = choice([0, 1, 2])
-        ai_next_key = utils.get_key(moves,[x,y])
 
-        print(f"决策出来,下一步棋子是{ai_next_key},串口发送启动")
-        stm32_serial.send_data(ser,ai_next_key[0])
-    else:
-
-        # clean()
-        print('')
-        print(f'Computer turn [{c_choice}]')
-        render(board, c_choice, h_choice)
-
-
-
-        move = minimax(board, depth, COMP)
-        x, y = move[0], move[1]
-        
-        # 通过串口发送数据给stm32
-        ai_next_key = utils.get_key(moves,[x,y])
-
-
-        print(f"决策出来,下一步棋子是{ai_next_key},串口发送启动")
-        stm32_serial.send_data(ser,ai_next_key[0])
-    
-
-    set_move(x, y, COMP)
-
-def human_turn(ser):
-    """
-    直接使用串口延时
-    """
     depth = len(empty_cells(board))
     if depth == 0 or game_over(board):
         return
 
     # clean()
+    print('')
+    print(f'Computer turn [{c_choice}]')
+    render(board, c_choice, h_choice)
+
+
+
+    move = minimax(board, depth, COMP)
+    x, y = move[0], move[1]
+    
+    # 通过串口发送数据给stm32
+    ai_next_key = utils.get_key(moves,[x,y])
+
+
+    print(f"决策出来,下一步棋子是{ai_next_key},串口发送启动")
+    stm32_serial.send_data(ser,ai_next_key)
+    # stm32_serial.send_data(ai_next_key)
+    
+
+    set_move(x, y, COMP)
+    time.sleep(1)
+
+
+def human_turn(c_choice, h_choice):
+    """
+    The Human plays choosing a valid move.
+    :param c_choice: computer's choice X or O
+    :param h_choice: human's choice X or O
+    :return:
+    """
+    depth = len(empty_cells(board))
+    if depth == 0 or game_over(board):
+        return
+
+    # Dictionary of valid moves
+    move = -1
+
+
+    # clean()
 
     print('')
-    print(f'人类等待按键按下,轮到ai下棋 -----')
+    print(f'Human turn [{h_choice}]')
+    render(board, c_choice, h_choice)
 
-    # 收到一帧就进入这个循环(案件按下,推出发送设定的东西)
-    while True:   
-        if ser.in_waiting > 0:  
-            break
+    while move < 1 or move > 9:
+        try:
+            move = int(input('Use numpad (1..9): '))
+            coord = moves[move]
+            can_move = set_move(coord[0], coord[1], HUMAN)
+
+            if not can_move:
+                print('Bad move')
+                move = -1
+        except (EOFError, KeyboardInterrupt):
+            print('Bye')
+            exit()
+        except (KeyError, ValueError):
+            print('Bad choice')
+
 
 
 
 def main():
 
     
-    ser = stm32_serial.init_serial()
+    # ser= stm32_serial.init_serial()
     
 
     """
@@ -362,8 +389,7 @@ def main():
     print('')
     h_choice = 'X'  # X or O
     c_choice = "O"  # X or O
-    first_flag = True  #第四题,让AI随机先行,然后第一步棋子由用户输入来设置
-    
+    first = 'N'  #第四题,让AI随机先行
 
 
     # Human may starts first
@@ -372,39 +398,8 @@ def main():
 
     # Main loop of this game
     while len(empty_cells(board)) > 0 and not game_over(board):
-        
-        ser.flushInput()
-        ser.flushOutput()
-
-        while(True):
-            if ser.in_waiting > 0:
-                frame_header = ser.read(1)
-                if frame_header != b'\x0A':
-                    continue
-                    # return None  # 帧头不匹配
-                data = ser.read(1)
-                print(f"收到串口数据: {data[0]}")
-                if data[0] == 2:
-                    break
-
-
-
-
-
-                # if data[0] == 0x0A and data[2] == 0x0B:
-                #     print(f"收到串口数据: {data[1]}")
-                #     if(data[1] == 0x01):
-                #         break
-
-        ser.flushInput()
-        ser.flushOutput()
-
-        ai_turn(ser,c_choice, h_choice)
-
-        ser.flushInput()
-        ser.flushOutput()
-         
-        # human_turn(ser)
+        ai_turn(c_choice, h_choice)
+        # human_turn(c_choice, h_choice)
 
     
     # Game over message
