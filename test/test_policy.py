@@ -1,20 +1,9 @@
-
-
 #!/usr/bin/env python3
 from math import inf as infinity
 from random import choice
 import platform
 import time
 from os import system
-
-"""
-An implementation of Minimax AI Algorithm in Tic Tac Toe,
-using Python This is for the 2024 eletric Ti club question E.
-This software is available under GPL license.
-Author: Clederson Cruz
-Year: 2017
-License: GNU GENERAL PUBLIC LICENSE (GPL)
-"""
 
 HUMAN = -1
 COMP = +1

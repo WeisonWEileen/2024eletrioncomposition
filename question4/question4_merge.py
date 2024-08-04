@@ -1,9 +1,16 @@
+"""
+An implementation of Minimax AI Algorithm in Tic Tac Toe,
+using Python.
+This software is available under GPL license.
+Author: Weison Pan 
+Year: 2024
+License: GNU GENERAL PUBLIC LICENSE (GPL)
+"""
+
 # 问题描述
 # 装置执黑棋(1)先行与人对弈（第 1 步方格可设置）,1
 # 若人(-1)应对的第 1 步白, -1
 # 棋有错误，装置能获胜。
-
-
 # X对应的是白色棋子,O对应的是黑色棋子
 
 
@@ -21,14 +28,7 @@ import vision
 import utils
 import struct  
 
-"""
-An implementation of Minimax AI Algorithm in Tic Tac Toe,
-using Python.
-This software is available under GPL license.
-Author: Weison Pan 
-Year: 2024
-License: GNU GENERAL PUBLIC LICENSE (GPL)
-"""
+
 
 HUMAN = -1
 COMP = +1
@@ -352,7 +352,6 @@ def main():
     
     ser = stm32_serial.init_serial()
     
-
     """
     Main function that calls all functions
     """

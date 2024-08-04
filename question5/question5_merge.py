@@ -16,6 +16,10 @@ from os import system
 import cv2
 import numpy as np
 
+import sys
+sys.path.append("..")
+from question4 import vision
+
 import vision
 import utils
 import stm32_serial
