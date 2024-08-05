@@ -1,18 +1,22 @@
 
-### 下棋AI算法
+## 下棋AI算法
+
+### min-max 算法
 由于我们总可以保证人类这边下棋是下是最优的一步，所以自动任务（第四第五题）的算法使用 **min-max算法**，这是一种递归的算法，一种动态博弈的算法，一种假设人类也在采取最佳行动的情况下确定最佳行动的算法
 
-需要注意的是 min-max 算法并不是最优的算法，因为当对手出现失误的时候，这个算法并没有发现漏洞的能力，可以运行```..test/test_policy.py```算法测试尝试。
+需要注意的是 min-max 算法并不是最优的算法，因为当对手出现失误的时候，这个算法并没有发现漏洞的能力，可以运行```algorithm_test/min_max.py```算法测试尝试。
 
-比如这里轮到人类下一个X到第6个格子
+例如，这里轮到人类下一个X到第6个格子
 <div style="text-align: center;">
-	<img src="./docs/01.png" alt="Alt Text" width="300" height="300" />
+	<img src="./docs/01.png" alt="Alt Text" width="300" height="290" />
 </div>
 AI本可以直接选择第8个就赢了，但是它没有选择第8个，而是选择了第三个
 <div style="text-align: center;">
 	<img src="./docs/02.png" alt="Alt Text" width="300" height="280" />
 </div>
 
+### 强化学习 (Reinforcement Learning)
+上述min max算法并不是 optimal solution，动态规划 ( dynamic programming)是一种可以计算最优解的算法，但是需要输入对手的完整状态信息，计算量庞大。
 
 ### 标定的9个点的坐标
 由于时间上的紧迫性、视觉识别经验不足以及硬件选型上面的失误，我们并不打算做旋转的那题
