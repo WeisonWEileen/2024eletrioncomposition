@@ -44,6 +44,22 @@ AI     1 O 白色
 https://gitee.com/linsen06/tic-tac-toe-esports/blob/master/minimax.py
 
 ## 硬件设计
+实物如下
+<div style="text-align: center;">
+	<img src="./docs/06.jpg" alt="Alt Text" width="400" height="280" />
+</div>
+采用丝杆+步进电机+舵机摆臂设计
+<div style="text-align: center;">
+	<img src="./docs/03.png" alt="Alt Text" width="400" height="280" />
+</div>
+<div style="text-align: center;">
+	<img src="./docs/04.png" alt="Alt Text" width="300" height="280" />
+</div>
+<div style="text-align: center;">
+	<img src="./docs/05.png" alt="Alt Text" width="300" height="200" />
+</div>
+步进电机能够轻松实现位置准确控制，摆臂能够轻松实现棋子约90°上下运动，吸棋和放棋的过程中不影响旁边的棋子
+
 
 ### @ TODO
 - 看看有没有好的方法实现又能一直开着opencv识别一遍
